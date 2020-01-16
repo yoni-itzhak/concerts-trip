@@ -89,8 +89,8 @@
                             selectionRequired: 1,
                             maxShownResults: 4,
                             limitOfValues: 3,
+                            disabled: true,
                             cache: true,
-                            disabled: false,
                             cacheLifetime: 1
                         })
                         .on('change:flexdatalist', function(){
@@ -101,15 +101,12 @@
                             });
                             return false;
                         });
-                        // $('#dateRange').on('apply.daterangepicker', function() {
-                        //     $('#genre').flexdatalist('disabled', false);
-                        //     if (got_genres_data){
-                        //         $('#genre').flexdatalist('reset')
-                        //     }
-                        // });
-                        // if ($('#allDates').is(':checked')) {
-                        //     $('#genre').flexdatalist('disabled', false);
-                        // }
+                        $('#dateRange').on('apply.daterangepicker', function() {
+                            $('#genre').flexdatalist('disabled', false);
+                        });
+                        if ($('#allDates').is(':checked')) {
+                            $('#genre').flexdatalist('disabled', false);
+                        }
                     </script>
                     <p id="genresResult"></p>
                 </div>
