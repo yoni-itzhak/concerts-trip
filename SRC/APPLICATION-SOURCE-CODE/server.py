@@ -36,8 +36,8 @@ def date_range_process():
         global date_range
         date_range_result = request.args.get('date_range')
         date_range.start, date_range.end = _get_date_range_mysql(date_range_result)
-        there_are_shows = queries.are_there_concerts_on_these_dates(date_range.start, date_range.end)
-        if not there_are_shows:
+        are_there_shows = queries.are_there_concerts_on_these_dates(date_range.start, date_range.end)
+        if not are_there_shows:
             return jsonify(result='Sorry, no concerts on these dates')
         else:
             return jsonify(result='Great time to travel!')
@@ -81,21 +81,21 @@ def artists_process():
 @app.route('/get_artists')
 def get_artists():
     # print("in get_artists")
-    shown_artists_list = queries.query_get_artists()
+    shown_artists_list = queries.query_get_artists(date_range.start, date_range.end, locations_list)
     return jsonify(result=shown_artists_list)
 
 
 @app.route('/get_genres')
 def get_genres():
     # print("in get_genres")
-    shown_genres_list = queries.query_get_genres()
+    shown_genres_list = queries.query_get_genres(date_range.start, date_range.end)
     return jsonify(result=shown_genres_list)
 
 
 @app.route('/get_locations')
 def get_locations():
     # print('in get_locations')
-    shown_locations_list = queries.query_get_locations()
+    shown_locations_list = queries.query_get_locations(date_range.start, date_range.end, genres_list)
     result = {'results': shown_locations_list}
     return result
 
@@ -108,7 +108,8 @@ def process_form():
 
 @app.route('/get_recommendations')
 def get_recommendations():
-    return jsonify(result='recommendations')
+    recommendations = queries.query_get_recommendations()
+    return jsonify(result=recommendations)
 
 
 @app.route('/')
