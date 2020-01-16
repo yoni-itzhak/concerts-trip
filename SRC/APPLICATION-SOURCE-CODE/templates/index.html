@@ -3,21 +3,230 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <title>Concerts Tour</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <link href="../static/jquery-flexdatalist-2.2.4/jquery.flexdatalist.min.css" rel="stylesheet" type="text/css" />
+    <script src="../static/jquery-flexdatalist-2.2.4/jquery.flexdatalist.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+    <title>Concerts Trip</title>
 </head>
 
-<body class="bg-class">
+<body style="background-color: white">
     <div class="container">
-        <div class="py-5 text-center">
-        <h1>Welcome to Concerts Tour</h1>
-        <p class="font-weight-bold">The best place for organizing your next musical trip</p>
+        <div class="py-2 text-center">
+        <h1 class="display-3">Concerts Trip</h1>
+        <p class="lead">The best place for organizing your next musical trip</p>
         </div>
-</div>
+        <p class="font-weight-bold">Please follow the steps below</p>
+        <form id="mainForm" method="POST" action="/concerts">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="dateRange"><span class="badge badge-secondary">1</span> Trip Dates</label>
+                    <input type="text" class="form-control" id="dateRange" name="daterange">
+                    <input type="checkbox" name="datesCheckbox" id="allDates"> I always want to travel<br>
+                    <script>
+                        $(function() {
+                            $('input[name="daterange"]').daterangepicker({
+                                opens: 'left',
+                                locale:{
+                                    format: 'DD/MM/YY'
+                                }
+                            })
+                        });
+                        $('#dateRange').on('apply.daterangepicker', function(){
+                            $.getJSON('/date_range_process',{
+                                date_range: $('input[name="daterange"]').val(),
+                            }, function(data){
+                                $("#daterangeResult").text(data.result);
+                            });
+                        });
+                        $('#allDates').change(function(){
+                            $('#dateRange').prop("disabled", $(this).is(':checked'));
+                            $('#genre').flexdatalist('disabled', false);
+                        })
+                    </script>
+                    <p id="daterangeResult"></p>
+                </div>
+                <div class="col-md-6 mb-3" id="genre_div">
+                    <label for="genre"><span class="badge badge-secondary">2</span> Genres (You can pick up to 3)</label>
+                    <input type="text"
+                           class="flexdatalist form-control"
+                           data-min-length="0"
+                           id="genre"
+                           name="chosen_genres"
+                           multiple="multiple"
+                           list="genres"
+                           data-selection-required='1'>
+                    <datalist id="genres">
+                    </datalist>
+                    <script>
+                        let got_genres_data = false;
+                        let genres_list = [];
+                        $('#genre')
+                            .on('before:flexdatalist.data', function(){
+                            let req = $.ajax({
+                                url: '/get_genres',
+                                type: 'GET'
+                            });
+                            req.done(function (data) {
+                                genres_list = data.result;
+                            });
+                            if (!got_genres_data) {
+                                for (let item of genres_list) {
+                                    got_genres_data = true;
+                                    var option = $('<option value="' + item + '">');
+                                    $('#genres').append(option);
+                                }
+                            }
+                        })
+                        .flexdatalist({
+                            minLength: 0,
+                            selectionRequired: 1,
+                            maxShownResults: 4,
+                            limitOfValues: 3,
+                            cache: true,
+                            disabled: false,
+                            cacheLifetime: 1
+                        })
+                        .on('change:flexdatalist', function(){
+                            $.getJSON('/genres_process',{
+                                chosen_genres: $('input[name="chosen_genres"]').val(),
+                            }, function(data){
+                                $("#genresResult").text(data.result);
+                            });
+                            return false;
+                        });
+                        // $('#dateRange').on('apply.daterangepicker', function() {
+                        //     $('#genre').flexdatalist('disabled', false);
+                        //     if (got_genres_data){
+                        //         $('#genre').flexdatalist('reset')
+                        //     }
+                        // });
+                        // if ($('#allDates').is(':checked')) {
+                        //     $('#genre').flexdatalist('disabled', false);
+                        // }
+                    </script>
+                    <p id="genresResult"></p>
+                </div>
+                <div id="ex1" class="modal" style="height: 400px;">
+                    <script>
+                        $.getJSON('/get_recommendations', function(data){
+                            $("#recommendationsResults").text(data.result);
+                        });
+                    </script>
+                    <p id="recommendationsResults"></p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <br>
+                    <a id="recoBtn" type="button" class="btn btn-outline-dark" href="#ex1" rel="modal:open">Recommendations</a>
+                </div>
+            </div>
 
-<div class=""
-
-
+            <div class="row">
+                <div class="col-md-6" id="locations-div">
+                    <label for="location"> <span class="badge badge-secondary">3</span> Locations (You can pick up to 5)</label>
+                    <input type='text'
+                           class='flexdatalist form-control'
+                           data-search-in='["city","country","continent"]'
+                           data-visible-properties='["city","country","continent"]'
+                           data-selection-required='true'
+                           data-text-property='{city}, {country}'
+                           data-value-property='*'
+                           data-min-length='0'
+                           data-url="/get_locations"
+                           id='location'
+                           name='chosen_locations'
+                           multiple="multiple">
+                    <script>
+                        $('#location').flexdatalist({
+                            selectionRequired: true,
+                            limitOfValues: 5,
+                            maxShownResults: 4,
+                            textProperty:'{city}, {country}',
+                            minLength: 0,
+                            valueProperty: '*',
+                            visibleProperties: ["city","country","continent"],
+                            searchIn: ["city", "country", "continent"],
+                            url: '/get_locations',
+                            chainedRelatives: true,
+                            cache: true,
+                            cacheLifetime: 1,
+                            relatives:'#genre, #dateRange'
+                        })
+                        .on('change:flexdatalist', function(){
+                            $.getJSON('/locations_process',{
+                                chosen_locations: $('input[name="chosen_locations"]').val(),
+                            }, function(data){
+                                $("#locationsResult").text(data.result);
+                            });
+                            return false;
+                        });
+                    </script>
+                    <p id="locationsResult"></p>
+                </div>
+                <div class="col-md-6" id="div-artists">
+                    <label for="mustSeeArtists"><span class="badge badge-secondary">4</span> Must See Artists (You can pick up to 3)</label>
+                    <input type="text"
+                           class="flexdatalist form-control"
+                           data-min-length="0"
+                           id="mustSeeArtists"
+                           name="chosen_artists"
+                           multiple="multiple"
+                           list="mustSeeArtistsId"
+                           data-selection-required='1'>
+                    <datalist id="mustSeeArtistsId">
+                    </datalist>
+                    <script>
+                        let got_artists_data = false;
+                        let artists_list = [];
+                        $('#mustSeeArtists').on('before:flexdatalist.data', function(){
+                            req = $.ajax({
+                                url: '/get_artists',
+                                type: 'GET'
+                            });
+                            req.done(function (data) {
+                                artists_list = data.result;
+                            });
+                            if (!got_artists_data) {
+                                for (let item of artists_list) {
+                                    got_artists_data = true;
+                                    var option = $('<option value="' + item + '">');
+                                    $('#mustSeeArtistsId').append(option);
+                                }
+                            }
+                        })
+                        .flexdatalist({
+                            minLength: 0,
+                            selectionRequired: 1,
+                            maxShownResults: 4,
+                            limitOfValues: 3,
+                            chainedRelatives: true,
+                            relatives:'#location',
+                            cache: true,
+                            cacheLifetime: 1
+                        })
+                        .on('change:flexdatalist', function(){
+                            $.getJSON('/artists_process',{
+                                chosen_artists: $('input[name="chosen_artists"]').val(),
+                            }, function(data){
+                                $("#artistsResult").text(data.result);
+                            });
+                            return false;
+                        });
+                    </script>
+                    <p id="artistsResult"></p>
+                </div>
+            </div>
+            <hr>
+            <div class="col-md-11.5 text-center">
+                <input type="submit" class="btn btn-secondary btn-lg" id="submitButton" value="Submit">
+            </div>
+        </form>
+    </div>
 </body>
 </html>

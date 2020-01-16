@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <title>Concerts</title>
+    <link rel="stylesheet" href="../static/style.css" />
+</head>
+    <body>
+        <div class="container">
+            <div class="py-1 text-center">
+                <h1 class="display-4">Suggested Concerts</h1>
+<!--                <p class="lead">These are the concerts we found for you</p>-->
+            </div>
+            <div class="text-center">
+                <div class="row">
+                    <h5>Keyword in the artist or venue description (e.g. arena, romantic, etc.):</h5>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="keyWord">
+                    </div>
+                    <input type="button" class="btn btn-secondary" id="keyWordBtn" value="Filter">
+                    <script>
+                        $('#keyWordBtn').click()
+                    </script>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
