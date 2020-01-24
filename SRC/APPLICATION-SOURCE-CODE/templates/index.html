@@ -16,13 +16,28 @@
     <title>Concerts Trip</title>
 </head>
 
-<body style="background-color: white">
+<body style="background-image: url('../static/assets/bg-image.jpg'); height: 100%; background-position: center;
+background-repeat: no-repeat;  background-size: cover; background-color: white">
     <div class="container">
         <div class="py-2 text-center">
         <h1 class="display-3">Concerts Trip</h1>
         <p class="lead">The best place for organizing your next musical trip</p>
         </div>
-        <p class="font-weight-bold">Please follow the steps below</p>
+        <div class="row">
+            <span style="font-size: 120%"><strong>Get recommendations based on: </strong></span>
+        <div id="ex1" class="modal" style="height: 400px;">
+            <script>
+                $.getJSON('/get_recommendations', function(data){
+                    $("#recommendationsResults").text(data.result);
+                });
+            </script>
+            <p id="recommendationsResults"></p>
+        </div>
+            <a id="recoBtn" type="button" class="btn btn-outline-primary" href="#ex1" rel="modal:open" style="margin-right: 20px; margin-left: 10px;"> Shows</a>
+            <a id="recoBtn" type="button" class="btn btn-outline-info" href="#ex1" rel="modal:open" style="margin-right: 20px"> Artists</a>
+            <a id="recoBtn" type="button" class="btn btn-outline-success" href="#ex1" rel="modal:open"> Genre</a>
+        </div>
+        <br>
         <form id="mainForm" method="POST" action="/concerts">
             <div class="row">
                 <div class="col-md-3 mb-3">
@@ -34,8 +49,10 @@
                             $('input[name="daterange"]').daterangepicker({
                                 opens: 'left',
                                 locale:{
-                                    format: 'DD/MM/YY'
-                                }
+                                    format: 'DD/MM/YY',
+                                },
+                                minDate: '27/01/2020',
+                                maxDat: '02/12/2023'
                             })
                         });
                         $('#dateRange').on('apply.daterangepicker', function(){
@@ -50,7 +67,7 @@
                             $('#genre').flexdatalist('disabled', false);
                         })
                     </script>
-                    <p id="daterangeResult"></p>
+                    <p id="daterangeResult"><bold></bold></p>
                 </div>
                 <div class="col-md-6 mb-3" id="genre_div">
                     <label for="genre"><span class="badge badge-secondary">2</span> Genres (You can pick up to 3)</label>
@@ -61,37 +78,28 @@
                            name="chosen_genres"
                            multiple="multiple"
                            list="genres"
-                           data-selection-required='1'>
+                           data-search-in='["genre"]'
+                           data-visible-properties='["genre"]'
+                           data-selection-required='true'
+                           data-text-property='{genre}'
+                           data-value-property='*'
+                           data-url="/get_genres">
                     <datalist id="genres">
                     </datalist>
                     <script>
-                        let got_genres_data = false;
-                        let genres_list = [];
-                        $('#genre')
-                            .on('before:flexdatalist.data', function(){
-                            let req = $.ajax({
-                                url: '/get_genres',
-                                type: 'GET'
-                            });
-                            req.done(function (data) {
-                                genres_list = data.result;
-                            });
-                            if (!got_genres_data) {
-                                for (let item of genres_list) {
-                                    got_genres_data = true;
-                                    var option = $('<option value="' + item + '">');
-                                    $('#genres').append(option);
-                                }
-                            }
-                        })
-                        .flexdatalist({
+                        $('#genre').flexdatalist({
                             minLength: 0,
-                            selectionRequired: 1,
-                            maxShownResults: 4,
+                            selectionRequired: true,
                             limitOfValues: 3,
                             disabled: true,
-                            cache: true,
-                            cacheLifetime: 1
+                            maxShownResults: 4,
+                            textProperty:'{genre}',
+                            valueProperty: 'genre',
+                            visibleProperties: ["genre"],
+                            searchIn: ["genre"],
+                            url: '/get_genres',
+                            cache: false,
+                            {#cacheLifetime: 0.5,#}
                         })
                         .on('change:flexdatalist', function(){
                             $.getJSON('/genres_process',{
@@ -101,26 +109,30 @@
                             });
                             return false;
                         });
+                        console.log($('#genre').flexdatalist('value'));
+                        let chosen_dates = false;
                         $('#dateRange').on('apply.daterangepicker', function() {
-                            $('#genre').flexdatalist('disabled', false);
+                            if (chosen_dates){
+                                $.getJSON('/check_new_dates', {
+                                    date_range: $('input[name="daterange"]').val(),
+                                }, function(data){
+                                    if(data.result !== ""){
+                                        alert(data.result);
+                                    }
+                                });
+                            }
+                            chosen_dates = true;
+                            $('#genre').flexdatalist('disabled', false)
                         });
-                        if ($('#allDates').is(':checked')) {
-                            $('#genre').flexdatalist('disabled', false);
-                        }
+                        $('#allDates').change(function() {
+                            if (!$(this).is(':checked') && !chosen_dates) {
+                                $('#genre').flexdatalist('disabled', true);
+                            } else {
+                                $('#genre').flexdatalist('disabled', false);
+                            }
+                        });
                     </script>
                     <p id="genresResult"></p>
-                </div>
-                <div id="ex1" class="modal" style="height: 400px;">
-                    <script>
-                        $.getJSON('/get_recommendations', function(data){
-                            $("#recommendationsResults").text(data.result);
-                        });
-                    </script>
-                    <p id="recommendationsResults"></p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <br>
-                    <a id="recoBtn" type="button" class="btn btn-outline-dark" href="#ex1" rel="modal:open">Recommendations</a>
                 </div>
             </div>
 
@@ -151,8 +163,8 @@
                             searchIn: ["city", "country", "continent"],
                             url: '/get_locations',
                             chainedRelatives: true,
-                            cache: true,
-                            cacheLifetime: 1,
+                            cache: false,
+                            {#cacheLifetime: 0.5,#}
                             relatives:'#genre, #dateRange'
                         })
                         .on('change:flexdatalist', function(){
@@ -175,37 +187,30 @@
                            name="chosen_artists"
                            multiple="multiple"
                            list="mustSeeArtistsId"
-                           data-selection-required='1'>
+                           data-search-in='["artist"]'
+                           data-visible-properties='["artist"]'
+                           data-selection-required='true'
+                           data-text-property='{artist}'
+                           data-value-property='*'
+                           data-url="/get_artists">
                     <datalist id="mustSeeArtistsId">
                     </datalist>
                     <script>
-                        let got_artists_data = false;
-                        let artists_list = [];
-                        $('#mustSeeArtists').on('before:flexdatalist.data', function(){
-                            req = $.ajax({
-                                url: '/get_artists',
-                                type: 'GET'
-                            });
-                            req.done(function (data) {
-                                artists_list = data.result;
-                            });
-                            if (!got_artists_data) {
-                                for (let item of artists_list) {
-                                    got_artists_data = true;
-                                    var option = $('<option value="' + item + '">');
-                                    $('#mustSeeArtistsId').append(option);
-                                }
-                            }
-                        })
-                        .flexdatalist({
+                        $('#mustSeeArtists').flexdatalist({
                             minLength: 0,
-                            selectionRequired: 1,
                             maxShownResults: 4,
                             limitOfValues: 3,
                             chainedRelatives: true,
                             relatives:'#location',
-                            cache: true,
-                            cacheLifetime: 1
+                            cache: false,
+                            {#cacheLifetime: 0.5,#}
+                            selectionRequired: true,
+                            disabled: true,
+                            textProperty:'{artist}',
+                            valueProperty: '*',
+                            visibleProperties: ["artist"],
+                            searchIn: ["artist"],
+                            url: '/get_artists',
                         })
                         .on('change:flexdatalist', function(){
                             $.getJSON('/artists_process',{
@@ -217,6 +222,7 @@
                         });
                     </script>
                     <p id="artistsResult"></p>
+                    <input type="checkbox" name="warmUp"> Include warm-up shows
                 </div>
             </div>
             <hr>
