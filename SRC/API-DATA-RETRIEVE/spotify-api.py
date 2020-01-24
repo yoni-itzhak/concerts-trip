@@ -131,7 +131,6 @@ def iterate_through_artists(artists_list):
     return artists_final
 
 
-print("\n")
-bands = retrieve_all_artists("bands")
-final = iterate_through_artists(bands)
-write_output_to_csv(final, "artists_final")
+# bands = retrieve_all_artists("bands")
+# final = iterate_through_artists(bands)
+# write_output_to_csv(final, "artists_final")
