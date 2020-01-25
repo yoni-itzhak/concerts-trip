@@ -195,7 +195,7 @@ def query_get_concerts(start_date, end_date, genre_list, locations_list, artists
 
     big_query = """
                   WITH ORDERED AS
-                  ( SELECT distinct id, date, artist_id, artist, event, e_popularity, country, city, sort_key, ROW_NUMBER() OVER (PARTITION BY id ORDER BY headline DESC, popularity desc) AS rn
+                  ( SELECT distinct id, date, artist_id, artist, event, e_popularity, country, city, sort_key,  ROW_NUMBER() OVER (PARTITION BY id ORDER BY headline DESC, popularity desc) AS rn
                   FROM (""" + query + """) as mytable)
                   SELECT *
                   FROM ORDERED
@@ -238,13 +238,13 @@ def query_get_summary(concerts_artists_ids_list):
     :return: The chosen concerts based on their ids, including a link to songkick.
     """
     return """
-    SELECT DISTINCT e.date AS date, a.artist_name AS artist, e.event_name as event, e.kick_link, co.country_name as country, c.city_name as city, a.img_link as photo
-    FROM  artists as a, artist_event as ae, events as e, venues as v, cities as c, countries as co, continents as con
-    WHERE a.id = ae.artist_id AND ae.event_id = e.id
-      AND e.venue_id = v.id AND v.city_id = c.id AND c.country_id = co.id
-      AND co.continent_id = con.id
-      AND (e.id, a.id) IN {concerts_artists_ids_list}
-    """.format(concerts_artists_ids_list=concerts_artists_ids_list)
+        SELECT DISTINCT e.date AS date, e.event_name as event, e.kick_link, co.country_name as country, c.city_name as city, a.img_link as photo, v.name as venue_name, v.lat, v.lon
+        FROM  artists as a, artist_event as ae, events as e, venues as v, cities as c, countries as co, continents as con
+        WHERE a.id = ae.artist_id AND ae.event_id = e.id
+          AND e.venue_id = v.id AND v.city_id = c.id AND c.country_id = co.id
+          AND co.continent_id = con.id
+          AND (e.id, a.id) IN {concerts_artists_ids_list}
+        """.format(concerts_artists_ids_list=concerts_artists_ids_list)
 
 
 # I assumed that genre is a list
