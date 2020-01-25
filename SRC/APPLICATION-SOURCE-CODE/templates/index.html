@@ -14,6 +14,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
     <title>Concerts Trip</title>
+    <style>
+        p span {
+            background-color: ghostwhite;
+        }
+    </style>
 </head>
 
 <body style="background-image: url('../static/assets/bg-image.jpg'); height: 100%; background-position: center;
@@ -24,18 +29,42 @@ background-repeat: no-repeat;  background-size: cover; background-color: white">
         <p class="lead">The best place for organizing your next musical trip</p>
         </div>
         <div class="row">
-            <span style="font-size: 120%"><strong>Get recommendations based on: </strong></span>
-        <div id="ex1" class="modal" style="height: 400px;">
-            <script>
-                $.getJSON('/get_recommendations', function(data){
-                    $("#recommendationsResults").text(data.result);
-                });
-            </script>
-            <p id="recommendationsResults"></p>
-        </div>
-            <a id="recoBtn" type="button" class="btn btn-outline-primary" href="#ex1" rel="modal:open" style="margin-right: 20px; margin-left: 10px;"> Shows</a>
-            <a id="recoBtn" type="button" class="btn btn-outline-info" href="#ex1" rel="modal:open" style="margin-right: 20px"> Artists</a>
-            <a id="recoBtn" type="button" class="btn btn-outline-success" href="#ex1" rel="modal:open"> Genre</a>
+            <span style="font-size: 120%"><strong>Get recommendations for locations based on: </strong></span>
+            <div id="ex1" class="modal" style="height: 500px; overflow-y: scroll;">
+                <h3 style="text-align: center;">Africa</h3>
+                {{ recommend_shows_africa }}
+                <h3 style="text-align: center;">Asia</h3>
+                {{ recommend_shows_asia }}
+                <h3 style="text-align: center;">Europe</h3>
+                {{ recommend_shows_europe }}
+                <h3 style="text-align: center;">North America</h3>
+                {{ recommend_shows_north_america }}
+                <h3 style="text-align: center;">South America</h3>
+                {{ recommend_shows_south_america }}
+                <h3 style="text-align: center;">Oceania</h3>
+                {{ recommend_shows_north_oceania }}
+            </div>
+            <div id="ex2" class="modal" style="height: 500px; overflow-y: scroll;">
+                <h3 style="text-align: center;">Africa</h3>
+                {{ recommend_artists_africa }}
+                <h3 style="text-align: center;">Asia</h3>
+                {{ recommend_artists_asia }}
+                <h3 style="text-align: center;">Europe</h3>
+                {{ recommend_artists_europe }}
+                <h3 style="text-align: center;">North America</h3>
+                {{ recommend_artists_north_america }}
+                <h3 style="text-align: center;">South America</h3>
+                {{ recommend_artists_south_america }}
+                <h3 style="text-align: center;">Oceania</h3>
+                {{ recommend_artists_north_oceania }}
+            </div>
+            <div id="ex3" class="modal" style="height: 500px; overflow-y: scroll;">
+                <h3 style="text-align: center;">Best City for a Specific Genre</h3>
+                {{ recommend_city_genre }}
+            </div>
+            <a id="recoBtn" type="button" class="btn btn-outline-primary" href="#ex1" rel="modal:open" style="margin-right: 20px; margin-left: 10px;"> Number of Shows</a>
+            <a id="recoBtn" type="button" class="btn btn-outline-info" href="#ex2" rel="modal:open" style="margin-right: 20px"> Performing Artists' Followers</a>
+            <a id="recoBtn" type="button" class="btn btn-outline-success" href="#ex3" rel="modal:open"> Genre</a>
         </div>
         <br>
         <form id="mainForm" method="POST" action="/concerts">
@@ -87,6 +116,8 @@ background-repeat: no-repeat;  background-size: cover; background-color: white">
                     <datalist id="genres">
                     </datalist>
                     <script>
+                        let genre_picked = true;
+                        let location_picked = false;
                         $('#genre').flexdatalist({
                             minLength: 0,
                             selectionRequired: true,
@@ -98,18 +129,18 @@ background-repeat: no-repeat;  background-size: cover; background-color: white">
                             visibleProperties: ["genre"],
                             searchIn: ["genre"],
                             url: '/get_genres',
-                            cache: false,
-                            {#cacheLifetime: 0.5,#}
+                            cache: true,
                         })
                         .on('change:flexdatalist', function(){
-                            $.getJSON('/genres_process',{
-                                chosen_genres: $('input[name="chosen_genres"]').val(),
-                            }, function(data){
-                                $("#genresResult").text(data.result);
+                            $.ajax({
+                                type: 'POST',
+                                url: '/genres_process',
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                data: JSON.stringify($('input[name="chosen_genres"]').val())
                             });
-                            return false;
+                            genre_picked = ($('#genre').flexdatalist('value').length) > 0;
                         });
-                        console.log($('#genre').flexdatalist('value'));
                         let chosen_dates = false;
                         $('#dateRange').on('apply.daterangepicker', function() {
                             if (chosen_dates){
@@ -132,7 +163,6 @@ background-repeat: no-repeat;  background-size: cover; background-color: white">
                             }
                         });
                     </script>
-                    <p id="genresResult"></p>
                 </div>
             </div>
 
@@ -163,20 +193,26 @@ background-repeat: no-repeat;  background-size: cover; background-color: white">
                             searchIn: ["city", "country", "continent"],
                             url: '/get_locations',
                             chainedRelatives: true,
-                            cache: false,
-                            {#cacheLifetime: 0.5,#}
+                            cache: true,
                             relatives:'#genre, #dateRange'
                         })
                         .on('change:flexdatalist', function(){
-                            $.getJSON('/locations_process',{
-                                chosen_locations: $('input[name="chosen_locations"]').val(),
-                            }, function(data){
-                                $("#locationsResult").text(data.result);
+                            $.ajax({
+                                type: 'POST',
+                                url: '/locations_process',
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                data: JSON.stringify($('input[name="chosen_locations"]').val())
                             });
-                            return false;
+                            location_picked = ($('#location').flexdatalist('value').length) > 0;
+                            if (location_picked && genre_picked){
+                                $('#submitButton').prop("disabled", false);
+                            }
+                            else{
+                                $('#submitButton').prop("disabled", true);
+                            }
                         });
                     </script>
-                    <p id="locationsResult"></p>
                 </div>
                 <div class="col-md-6" id="div-artists">
                     <label for="mustSeeArtists"><span class="badge badge-secondary">4</span> Must See Artists (You can pick up to 3)</label>
@@ -202,8 +238,7 @@ background-repeat: no-repeat;  background-size: cover; background-color: white">
                             limitOfValues: 3,
                             chainedRelatives: true,
                             relatives:'#location',
-                            cache: false,
-                            {#cacheLifetime: 0.5,#}
+                            cache: true,
                             selectionRequired: true,
                             disabled: true,
                             textProperty:'{artist}',
@@ -213,21 +248,22 @@ background-repeat: no-repeat;  background-size: cover; background-color: white">
                             url: '/get_artists',
                         })
                         .on('change:flexdatalist', function(){
-                            $.getJSON('/artists_process',{
-                                chosen_artists: $('input[name="chosen_artists"]').val(),
-                            }, function(data){
-                                $("#artistsResult").text(data.result);
+                            $.ajax({
+                                type: 'POST',
+                                url: '/artists_process',
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                data: JSON.stringify($('input[name="chosen_artists"]').val())
                             });
-                            return false;
                         });
                     </script>
-                    <p id="artistsResult"></p>
                     <input type="checkbox" name="warmUp"> Include warm-up shows
                 </div>
             </div>
             <hr>
             <div class="col-md-11.5 text-center">
-                <input type="submit" class="btn btn-secondary btn-lg" id="submitButton" value="Submit">
+                <input type="submit" class="btn btn-secondary btn-lg" id="submitButton" value="Submit" disabled="disabled">
+                <p><span><strong>  Please select a genre and location to proceed  </strong></span></p>
             </div>
         </form>
     </div>

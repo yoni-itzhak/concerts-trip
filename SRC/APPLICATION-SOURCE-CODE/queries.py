@@ -115,12 +115,6 @@ def query_get_locations(start_date, end_date, genre_list):
     return query.format(end=end_date, start=start_date)
 
 
-def query_get_recommendations():
-    """
-    :return: You tell me
-    """
-
-
 def query_get_concerts(start_date, end_date, genre_list, locations_list, artists_list, warm_up):
     """
     :param start_date: The start date passed from the user, in the form of YYYY-MM-DD
@@ -210,7 +204,7 @@ def query_get_concerts(start_date, end_date, genre_list, locations_list, artists
     if artists_list:
         return big_query.format(end1=end_date, end2=end_date, start1=start_date, start2=start_date,
                                 warm_up=warm_up_statement)
-    return big_query.format(end1=end_date, start1=start_date)
+    return big_query.format(end1=end_date, start1=start_date, warm_up=warm_up_statement)
 
 
 def query_get_filtered_concerts(concerts_ids_list, keyword):
@@ -624,7 +618,7 @@ FROM (SELECT c.id as cityid, SUM(a.followers) as sum
 WHERE con.id = co.continent_id AND cityEvent.cityid = c.id AND c.country_id = co.id
 ORDER BY sum) AS t
         ) rs WHERE rnk <= 2
-ORDER BY con, sum"""
+ORDER BY con, sum DESC"""
 
 # SELECT rs.*
 #     FROM (
