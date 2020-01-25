@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <link rel="stylesheet" href="../static/style.css" />
+    <title>Concerts Trip</title>
+</head>
+    <body style="height: auto">
+        <div class="container">
+            <div class="py-1 text-center">
+                <h1 class="display-4">Results</h1>
+            </div>
+            <div style="overflow-y: scroll; height: 500px; text-align: center">
+                {{ chosen_concerts }}
+            </div>
+            <div class="text-center">
+                <hr>
+                <h3 class="display-5">Safe Travels from the Crazy Group</h3>
+                <div style="text-align: center">
+                    <button class="btn btn-info" onclick="window.history.back()" style="margin-right: 20px">Pick different concerts</button>
+                    <button class="btn btn-success" onclick="window.location.href='{{ url_for('index') }}'" style="margin-right: 20px">Start Over</button>
+                </div>
+            </div>
+            <br>
+        </div>
+
+    </body>
+</html>
+<script>
+    document.body.onclick=function(e){
+      e.preventDefault();
+      return false;
+    };
+    window.onload=function() {
+      document.body.onclick=null;
+      var links = document.querySelectorAll("a");
+      for (var i=0;i<links.length;i++) {
+        links[i].target="_blank";
+      }
+    }
+</script>

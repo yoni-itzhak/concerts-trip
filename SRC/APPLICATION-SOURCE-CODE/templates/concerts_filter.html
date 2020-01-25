@@ -11,14 +11,17 @@
     <body style="height: auto">
         <div class="container">
             <div class="py-1 text-center">
-                <h1 class="display-4">Suggested Concerts</h1>
+                <h1 class="display-4">Filtered Concerts</h1>
             </div>
             <br>
-            <form action="/concerts_filter" method="POST">
-                <span style="font-size: 130%">Filter according to a keyword (e.g. songwriter): </span>
-                <input type="text" name="keyWord">
-                <button>Filter</button>
-            </form>
+            <div style="text-align: center">
+                <button class="btn btn-info" id="backButton">Unfilter</button>
+            </div>
+            <script>
+                $('#backButton').click(function () {
+                    window.history.back()
+                })
+            </script>
             <br>
             <form action="/results" method="POST">
                 <div style="overflow-y: scroll; height: 500px; text-align: center">
@@ -26,15 +29,12 @@
                 </div>
                 <hr>
                 <div class="col-md-11.5 text-center">
-                    <input type="submit" class="btn btn-success btn-lg" id="submitButton" value="I'm Done" style="margin-right: 20px">
+                    <input type="submit" class="btn btn-success btn-lg" id="submitButton" value="I'm Done">
                 </div>
                 <br>
+                <br>
             </form>
-            <div class="col-md-11.5 text-center">
-                <button class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('index') }}'" style="margin-right: 20px">Start Over</button>
-            </div>
-            <br>
-            <br>
+
         </div>
     </body>
 </html>
