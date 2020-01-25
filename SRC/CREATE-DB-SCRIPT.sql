@@ -1,25 +1,25 @@
 CREATE TABLE cities (
-  id INT(11) NOT NULL AUTO_INCREMENT,
+  id INT(11) NOT NULL,
   city_name VARCHAR(50) NOT NULL,
   country_id INT(11) NOT NULL,
   PRIMARY KEY(id)
   );
 
 CREATE TABLE countries (
-  id INT(11) NOT NULL AUTO_INCREMENT,
+  id INT(11) NOT NULL,
   country_name VARCHAR(50) NOT NULL,
   continent_id INT(11) NOT NULL,
   PRIMARY KEY(id)
   );
 
 CREATE TABLE continents (
-  id INT(11) NOT NULL AUTO_INCREMENT,
+  id INT(11) NOT NULL,
   continent_name VARCHAR(50) NOT NULL,
   PRIMARY KEY(id)
  );
 
 CREATE TABLE artists (
-  id INT(11) NOT NULL AUTO_INCREMENT,
+  id INT(11) NOT NULL,
   artist_name VARCHAR(100) NOT NULL,
   popularity INT(11) NOT NULL,
   followers BIGINT(20) NOT NULL,
@@ -31,31 +31,30 @@ CREATE TABLE artists (
   );
 
 CREATE TABLE genres (
-  id INT(11) NOT NULL AUTO_INCREMENT,
+  id INT(11) NOT NULL,
   genre_name VARCHAR(50) NOT NULL,
   popularity INT(11),
   PRIMARY KEY (id)
   );
 
 CREATE TABLE players (
-  id INT(11) NOT NULL AUTO_INCREMENT,
+  id INT(11) NOT NULL,
   player_name VARCHAR(100) NOT NULL,
   PRIMARY KEY (id)
   );
 
 CREATE TABLE events (
-  id INT(11) NOT NULL AUTO_INCREMENT,
+  id INT(11) NOT NULL,
   event_name VARCHAR(200) NOT NULL,
   popularity FLOAT
   date DATE
-  time TIME
   kick_link VARCHAR(400)
   venue_id INT(11),
   PRIMARY KEY (id)
   );
 
 CREATE TABLE venues (
-  id INT(11) NOT NULL AUTO_INCREMENT,
+  id INT(11) NOT NULL,
   name VARCHAR(200) NOT NULL,
   description TEXT,
   lat VARCHAR(50),
@@ -94,16 +93,16 @@ ALTER TABLE artist_player ADD FOREIGN KEY (player_id) REFERENCES players (id);
 ALTER TABLE artist_genre ADD FOREIGN KEY (artist_id) REFERENCES artists (id);
 ALTER TABLE artist_genre ADD FOREIGN KEY (genre_id) REFERENCES genres (id);
 
-CREATE UNIQUE INDEX events_id_date ON events (events.id, events.date);
-CREATE UNIQUE INDEX events_id_popularity ON events (events.id, events.popularity);
-CREATE UNIQUE INDEX venues_id_city ON venues (venues.id, venues.city);
-CREATE UNIQUE INDEX artists_id_popularity ON artists (artists.id, artists.popularity);
-CREATE UNIQUE INDEX artists_id_followers ON artists (artists.id, artists.followers);
-CREATE UNIQUE INDEX city_to_country ON cities (cities.id, cities.country_id);
-CREATE UNIQUE INDEX country_to_continent ON countries (countries.id, countries.continent_id);
-CREATE UNIQUE INDEX players_id ON players (players.id);
-CREATE UNIQUE INDEX genre_id_name ON genres (genres.id, genres.name);
-CREATE UNIQUE INDEX genre_id_popularity ON genres (genres.id, genres.popularity);
-CREATE UNIQUE INDEX artist_to_event ON artist_event (artist_event.event_id, artist_event.artist_event);
-CREATE UNIQUE INDEX artist_to_player ON artist_player (artist_player.artist_id, artist_player.player_id);
-CREATE UNIQUE INDEX artist_to_genre ON artist_genre (artist_genre.artist_id, artist_genre.genre_id);
+CREATE UNIQUE INDEX events_id_date ON events (id, date);
+CREATE UNIQUE INDEX events_id_popularity ON events (id, popularity);
+CREATE UNIQUE INDEX venues_id_city ON venues (id, city_id);
+CREATE UNIQUE INDEX artists_id_popularity ON artists (id, popularity);
+CREATE UNIQUE INDEX artists_id_followers ON artists (id, followers);
+CREATE UNIQUE INDEX city_country_key ON cities (id, country_id);
+CREATE UNIQUE INDEX country_continent_key ON countries (id, continent_id);
+CREATE UNIQUE INDEX players_id ON players (id);
+CREATE UNIQUE INDEX genre_id_name ON genres (id, genre_name);
+CREATE UNIQUE INDEX genre_id_popularity ON genres (id, popularity);
+CREATE UNIQUE INDEX artist_to_event ON artist_event (event_id, artist_id);
+CREATE UNIQUE INDEX artist_to_player ON artist_player (artist_id, player_id);
+CREATE UNIQUE INDEX artist_to_genre ON artist_genre (artist_id, genre_id);
