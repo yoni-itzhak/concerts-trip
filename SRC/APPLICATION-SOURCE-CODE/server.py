@@ -1,7 +1,9 @@
 import os
 import ast
+
 from flask import Flask, render_template, request, jsonify
 from flask_table import Table, Col, html
+
 import DBConnection
 import queries
 
@@ -84,10 +86,8 @@ class AllConcertsTable(Table):
 
 class ResultsConcertsTable(Table):
     date = Col('Date')
-    artist = Col('Leading Artist')
+    location = ExternalURLCol('Location', url_attr='venue_link', attr='location')
     event_name = ExternalURLCol('Event Name', url_attr='kick_link', attr='event')
-    country = Col('Country')
-    city = Col('City')
     photo = ImgCol(' ', img_attr='photo')
 
 
@@ -128,6 +128,28 @@ def _format_displayed_concerts(displayed_concerts):
         display, *_ = event.rpartition('(')
         if display:
             concert['event'] = display.strip()
+
+
+def _format_displayed_result_concerts(displayed_concerts):
+    for concert in displayed_concerts:
+        concert['date'] = _get_normal_date(concert['date'])
+        event = concert['event']
+        display, *_ = event.rpartition('(')
+        if display:
+            concert['event'] = display.strip()
+        location_tuple = (concert['venue_name'], concert['city'], concert['country'])
+        concert['location'] = ', '.join(location_tuple)
+        concert['venue_link'] = 'https://www.google.com/maps/place/{0},{1}'.format(concert['lat'], concert['lon'])
+
+
+@app.errorhandler(405)
+def method_not_allowed(error):
+    return render_template('405_error.html'), 405
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('404_error.html'), 404
 
 
 @app.route('/date_range_process')
@@ -221,7 +243,7 @@ def process_form():
     try:
         global matching_concerts
         if request.method == "GET":
-            return "Please submit the form instead"
+            return render_template('submit_form.html')
         else:  # POST
             warm_up = True if request.form.get('warmUp') else False
             matching_concerts = DBConnection.execute_query(
@@ -266,7 +288,7 @@ def concerts_filter():
 def results():
     try:
         if request.method == "GET":
-            return "Please submit the form instead"
+            return render_template('submit_form.html')
         else:
             checkbox_values = request.form.getlist('input_checkbox')
         if not checkbox_values:
@@ -281,7 +303,7 @@ def results():
             if len(event_artist) == 1:
                 event_artist.append((-1, -1))
             chosen_concerts = DBConnection.execute_query(queries.query_get_summary(tuple(event_artist)))
-            _format_displayed_concerts(chosen_concerts)
+            _format_displayed_result_concerts(chosen_concerts)
             shown_chosen_concerts = ResultsConcertsTable(chosen_concerts, classes=['table'])
         return render_template('results.html', chosen_concerts=shown_chosen_concerts)
     except Exception as e:
