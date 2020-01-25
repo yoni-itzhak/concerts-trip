@@ -6,12 +6,16 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
 <body>
-<h4 style="text-align: center">Internal Server Error</h4>
-<div class="col-md-11.5 text-center">
-    <p>Error:</p>
-    {{ error_str }}
-    <p><a href="{{ url_for('index') }}">Back</a></p>
+<div class="container">
+    <br>
+    <div class="text-center">
+        <h4 style="text-align: center">Oh No! Internal Server Error</h4>
+        <p><strong>The ERROR was:</strong></p>
+        {{ error_str }}
+        <br>
+        <br>
+        <button class="btn btn-primary" onclick="window.location.href='{{ url_for('index') }}'">Try Again</button>
+    </div>
 </div>
-<h4 style="text-align: center">We'll get back on our feet shortly</h4>
 </body>
 </html>

@@ -88,7 +88,7 @@ class ResultsConcertsTable(Table):
     event_name = ExternalURLCol('Event Name', url_attr='kick_link', attr='event')
     country = Col('Country')
     city = Col('City')
-    photo = ImgCol('Photo', img_attr='photo')
+    photo = ImgCol(' ', img_attr='photo')
 
 
 class RecommendShowsTable(Table):
