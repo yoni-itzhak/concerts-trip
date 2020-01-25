@@ -192,7 +192,7 @@ def push_venues():
         reader = csv.DictReader(raw)
         for row in reader:
             curr_tuple = venue_tuple(row)
-            db_cur.execute(query,curr_tuple)
+            db_cur.execute(query, curr_tuple)
     db.commit()
 
 
