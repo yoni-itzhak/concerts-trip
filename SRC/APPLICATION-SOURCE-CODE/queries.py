@@ -1,5 +1,3 @@
-# '1999-12-31' the date type that SQL understands - datetime.date(year, month, day)
-
 
 def are_there_concerts_on_these_dates(start_date, end_date):
     """
@@ -17,7 +15,6 @@ def are_there_concerts_on_these_dates(start_date, end_date):
         WHERE E.date BETWEEN \"{start}\" AND \"{end}\"
         """.format(start=start_date, end=end_date)
 
-    # TODO: return True\false
 
 
 def query_get_genres(start_date, end_date):
@@ -39,9 +36,7 @@ def query_get_genres(start_date, end_date):
     WHERE g.id = available_genre.id
     ORDER BY g.popularity DESC
     """.format(start_date=start_date, end_date=end_date)
-    # TODO: is_headline
 
-    # TODO: return ['Rock', 'Pop', 'Metal']
 
 
 def query_get_artists(start_date, end_date, locations_list):
@@ -51,7 +46,6 @@ def query_get_artists(start_date, end_date, locations_list):
     :param locations_list: How ever you want to get it (we want city,country)
     :return: A list of artists
     """
-    # TODO: is_headline
 
     location_check = ""
     for i, loc_dict in enumerate(locations_list):
@@ -111,7 +105,6 @@ def query_get_locations(start_date, end_date, genre_list):
                                                         AND (""" + genre_check + """)  GROUP BY C.id) as city_event_sum
             WHERE c.id = city_event_sum.city_id AND c.country_id = co.id AND co.continent_id = con.id
             ORDER BY city_event_sum.event_sum DESC"""
-    # print(query.format(end=end_date, start=start_date))
     return query.format(end=end_date, start=start_date)
 
 
@@ -222,14 +215,6 @@ def query_get_filtered_concerts(concerts_ids_list, keyword):
 	    AND E.id = AE.event_id AND AE.artist_id = A.id AND V.id = E.venue_id
     """.format(concerts_ids_list=concerts_ids_list, keyword=keyword)
 
-    """
-    for creating INDEX - CREATE FULLTEXT INDEX artist_desc ON artists(description)
-
-    SELECT id, description FROM artists WHERE MATCH(description) AGAINST('metal')
-
-    for dropping INDEX - ALTER TABLE artists DROP INDEX artist_desc
-    """
-
 
 def query_get_summary(concerts_artists_ids_list):
     """
@@ -246,141 +231,6 @@ def query_get_summary(concerts_artists_ids_list):
           AND (e.id, a.id) IN {concerts_artists_ids_list}
         """.format(concerts_artists_ids_list=concerts_artists_ids_list)
 
-
-# I assumed that genre is a list
-# def get_location_by_dates_and_genre_ordered_by_events_per_location(start_date, end_date, genre):
-#     return """
-#     SELECT DISTINCT City.name as city, Country.name as country , Continent.name as continent
-#     FROM Genre JOIN ArtistGenre ON Genre.genreId=ArtistGenre.genreId
-#     JOIN Events ON ArtistGenre.artistId=Events.artistId
-#     JOIN City ON Events.cityId=City.cityId
-#     WHERE Genre.name IN \"{genre}\" AND (Events.date BETWEEN \"{start}\" AND \"{end}\")
-#     GROUP BY City.cityId AND City.countryId
-#     ORDER BY SUM(Events.eventID)
-#     UNION
-#     SELECT DISTINCT City.countryId
-#     FROM Genre JOIN ArtistGenre ON Genre.genreId=ArtistGenre.genreId
-#     JOIN Events ON ArtistGenre.artistId=Events.artistId
-#     JOIN City ON Events.cityId=City.cityId
-#     WHERE Genre.name IN \"{genre}\" AND (Events.date BETWEEN \"{start}\" AND \"{end}\")
-#     GROUP BY City.countryId
-#     ORDER BY SUM(Events.eventID)
-#     UNION
-#     SELECT DISTINCT Country.continentId
-#     FROM Genre JOIN ArtistGenre ON Genre.genreId=ArtistGenre.genreId
-#     JOIN Events ON ArtistGenre.artistId=Events.artistId
-#     JOIN City ON Events.cityId=City.cityId
-#     JOIN Country ON City.countryId =Country.countryId
-#     WHERE Genre.name IN \"{genre}\" AND (Events.date BETWEEN \"{start}\" AND \"{end}\")
-#     GROUP BY Country.continentId
-#     ORDER BY SUM(Events.eventID)
-#     """.format(end=end_date, start=start_date, genre=genre)
-
-
-# def get_location_by_dates_ordered_by_events_per_location(start_date, end_date):
-#     return """
-#     SELECT DISTINCT City.cityId, City.countryId
-#     FROM Genre JOIN ArtistGenre ON Genre.genreId=ArtistGenre.genreId
-#     JOIN Events ON ArtistGenre.artistId=Events.artistId
-#     JOIN City ON Events.cityId=City.cityId
-#     WHERE Events.date BETWEEN \"{start}\" AND \"{end}\"
-#     GROUP BY City.cityId AND City.countryId
-#     ORDER BY SUM(Events.eventID)
-#     UNION
-#     SELECT DISTINCT City.countryId
-#     FROM Genre JOIN ArtistGenre ON Genre.genreId=ArtistGenre.genreId
-#     JOIN Events ON ArtistGenre.artistId=Events.artistId
-#     JOIN City ON Events.cityId=City.cityId
-#     WHERE Events.date BETWEEN \"{start}\" AND \"{end}\"
-#     GROUP BY City.countryId
-#     ORDER BY SUM(Events.eventID)
-#     UNION
-#     SELECT DISTINCT Country.continentId
-#     FROM Genre JOIN ArtistGenre ON Genre.genreId=ArtistGenre.genreId
-#     JOIN Events ON ArtistGenre.artistId=Events.artistId
-#     JOIN City ON Events.cityId=City.cityId
-#     JOIN Country ON City.countryId =Country.countryId
-#     WHERE Events.date BETWEEN \"{start}\" AND \"{end}\"
-#     GROUP BY Country.continentId
-#     ORDER BY SUM(Events.eventID)
-#     """.format(end=end_date, start=start_date, genre=genre)
-#
-
-# def get_events_by_all(start_date, end_date, genre, locations, must_see_artist):
-#     return """
-#     SELECT
-#     FROM Genre JOIN ArtistGenre ON Genre.genreId=ArtistGenre.genreId
-#     JOIN Events ON ArtistGenre.artistId=Events.artistId
-#     JOIN City ON Events.cityId=City.cityId
-#     //TODO join with venue to the location
-#     WHERE Events.date BETWEEN \"{start}\" AND \"{end}\" AND
-#     GROUP BY City.cityId AND City.countryId
-#     ORDER BY SUM(Events.eventID)
-#     """
-
-# def get_genre():
-#     return """
-#         SELECT G.name
-#         FROM Genre as G, ArtistGenre as AG
-#         WHERE AG.genreId = G.genreId
-#         ORDER BY G.isMain, G.genrePopularity DESC
-#         """
-#
-# def get_artist():
-#     return """
-#            SELECT A.artistName
-#            FROM Artist as A, Event as E
-#            WHERE A.artistId = E.artistId
-#            ORDER BY A.artistPopularity, A.followers DESC
-#            """
-#
-#
-#
-# def get_sorted_artist_by_date(start_date, end_date):
-#     return """
-#     SELECT a.name
-#     FROM Artist as a, Event as e
-#     WHERE a.artistId = e.artistId AND E.date >= \"{start_date}\"
-#         AND  E.date <= \"{end_date}\"
-#     ORDER BY a.artistPopularity, a.followers DESC
-#     """.format(start_date=start_date, end_date=end_date)
-#
-# # TODO: probably should be deleted
-# def get_sorted_artist_with_their_best_genre():
-#     return """
-#     SELECT a.artistId as artistId, a.artistName as artistName, t.genreName as genreName
-#     FROM    (SELECT a.artistId as artistId, g.genreName as genreName, MAX(g.popularity) as max_gp
-#             FROM ArtistGenre as ag, Artist as a, Genre as g
-#             WHERE ag.genreId = g.genreId and a.artistId = ag.artistId
-#             GROUP by a.artistId) as t, Artist as a
-#     WHERE t.artistId = a.artistId
-#     ORDER by a.artistPopularity, a.followers DESC
-#     """
-#
-# def get_sorted_artist_with_their_best_genre_by_date(start_date, end_date):
-#     return """
-#     SELECT artist_best_genre.artistName as artistName, artist_best_genre.genreName as genreName
-#     FROM  SELECT a.artistId as artistId, a.artistName as artistName, t.genreName as genreName
-#     FROM    (SELECT a.artistId as artistId, g.genreName as genreName, MAX(g.popularity) as max_gp
-#             FROM ArtistGenre as ag, Artist as a, Genre as g
-#             WHERE ag.genreId = g.genreId and a.artistId = ag.artistId
-#             GROUP by a.artistId) as t, Artist as a
-#     WHERE t.artistId = a.artistId
-#     ORDER by a.artistPopularity, a.followers DESC as artist_best_genre, Event as e
-#     WHERE e.artistId = artist_best_genre.artistId AND E.date >= \"{start_date}\"
-#         AND  E.date <= \"{end_date}\"
-#     """.format(start_date=start_date, end_date=end_date)
-
-
-# def get_all_genre_city_avg_artist_popularity():
-#     return """
-#     SELECT G.genreName as genre, C.cityName as city, Country.countryName as country, AVG(A.artistPopularity) as avgArtistPopularity
-#     FROM Country, City C, Event E, Artist A, ArtistGenre AG, @@MAIN_GENRE@@ G
-#     WHERE City.cityId = E.cityId AND E.artistId = A.artistId
-#             AND AG.artistId = A.artistId AND Country.countryId = C.countryId
-#             AND G.genreId = AG.genreId
-#     GROUP BY G.genreId, C.cityId
-#     """
 
 def get_best_city_per_main_genre():
     return """
@@ -412,52 +262,6 @@ def get_best_city_per_main_genre():
     ORDER BY g.popularity desc"""
 
 
-#     return """
-#     SELECT *
-#     FROM    (SELECT G.genreName as genre, C.cityName as city, Country.countryName as country, AVG(A.artistPopularity) as avgArtistPopularity
-#             FROM Country, City C, Event E, Artist A, ArtistGenre AG, (SELECT G.name FROM Genre G WHERE G.isMain = 1 ORDER BY G.genrePopularity DESC) as MG
-#             WHERE City.cityId = E.cityId AND E.artistId = A.artistId
-#                     AND AG.artistId = A.artistId AND Country.countryId = C.countryId
-#                     AND MG.genreId = AG.genreId
-#                     GROUP BY MG.genreId, C.cityId) as Genre_City_AVG
-#     GROUP BY genre
-#     ORDER BY avgArtistPopularity DESC"""
-#
-#
-#
-#     """SELECT t1.genre, t1.city_name, t2.max_avg
-# FROM (SELECT g.genre_name as genre, c.city_name, AVG(a.popularity) as avgArtistPopularity
-# FROM (SELECT c.id AS id, COUNT(e.id) AS cnt FROM cities AS c, venues AS v, events AS e WHERE v.id = e.venue_id AND v.city_id = c.id GROUP BY c.id HAVING cnt > 3) AS city_ten,
-# genres AS g, venues AS v, artist_event AS ae, countries AS co, cities AS c, events AS e, artists AS a, artist_genre as ag, (SELECT g.id FROM genres as g ORDER BY g.popularity DESC LIMIT 8) as MG
-# WHERE city_ten.id = v.city_id AND v.id = e.venue_id AND e.id = ae.event_id AND ae.artist_id = a.id AND ae.is_headline = 1
-#       AND ag.artist_id = a.id AND co.id = c.country_id AND c.id = city_ten.id
-#       AND MG.id = ag.genre_id AND ag.artist_id = a.id AND MG.id = g.id
-# GROUP BY g.genre_name, c.city_name
-# HAVING COUNT(*) > 3
-# ORDER BY g.genre_name, avgArtistPopularity DESC) AS t1, (SELECT genre, MAX(avgArtistPopularity) AS max_avg FROM (SELECT g.genre_name as genre, c.city_name, AVG(a.popularity) as avgArtistPopularity
-# FROM (SELECT c.id AS id, COUNT(e.id) AS cnt FROM cities AS c, venues AS v, events AS e WHERE v.id = e.venue_id AND v.city_id = c.id GROUP BY c.id HAVING cnt > 3) AS city_ten,
-# genres AS g, venues AS v, artist_event AS ae, countries AS co, cities AS c, events AS e, artists AS a, artist_genre as ag, (SELECT g.id FROM genres as g ORDER BY g.popularity DESC LIMIT 8) as MG
-# WHERE city_ten.id = v.city_id AND v.id = e.venue_id AND e.id = ae.event_id AND ae.artist_id = a.id AND ae.is_headline = 1
-#       AND ag.artist_id = a.id AND co.id = c.country_id AND c.id = city_ten.id
-#       AND MG.id = ag.genre_id AND ag.artist_id = a.id AND MG.id = g.id
-# GROUP BY g.genre_name, c.city_name
-# HAVING COUNT(*) > 4
-#
-#     """
-
-
-# def get_best_city_per_continent():
-#     """
-#     SELECT co.name, c.name, cnt
-#     FROM (SELECT c.cityid as cityid, COUNT(*) as cnt
-#     FROM city as c, event as e
-#     WHERE e.cityId = c.cityId
-#     GROUP BY c.cityid) AS cityEvent, continent as co, city as c
-#     WHERE c.continentid = co.continentId and cityEvent.cityid = c.cityId
-#     GROUP by co.name
-#     ORDER BY cnt DESC
-#     """
-
 def get_top_3_city_per_continent_by_event_number():
     return """
     SELECT rs.con, rs.city, rs.cnt
@@ -472,66 +276,6 @@ def get_top_3_city_per_continent_by_event_number():
     WHERE rnk <=  3
     ORDER BY con, cnt desc
     """
-
-
-#
-#
-# SELECT rs.*
-#     FROM (
-#         SELECT con, city, cnt, Rank()
-#           over (Partition BY con
-#                 ORDER BY cnt DESC ) AS Rank
-#         FROM my
-#         ) rs WHERE Rank <= 2
-#
-# SELECT rs.*
-#     FROM (
-#         SELECT con, city, cnt, Rank()
-#           over (Partition BY con
-#                 ORDER BY cnt DESC ) AS Rank
-#         FROM (SELECT co.name as con, c.name as city, cnt
-# FROM (SELECT c.cityid as cityid, COUNT(*) as cnt
-# FROM city as c, event as e
-# WHERE e.cityId = c.cityId
-# GROUP BY c.cityid) AS cityEvent, continent as co, city as c
-# WHERE c.continentid = co.continentId and cityEvent.cityid = c.cityId
-# ORDER BY cnt DESC)
-#         ) rs WHERE Rank <=  5
-#
-#
-# SELECT a.con, a.city, a.cnt FROM (SELECT con.continent_name as con, c.city_name as city, cnt
-# FROM (SELECT c.id as cityid, COUNT(*) as cnt
-# 		FROM cities as c, events AS e, venues v
-# 		WHERE e.venue_id = v.id AND v.city_id = c.id
-# 		GROUP BY c.id) AS cityEvent, continents as con, cities AS c, countries AS co
-# WHERE con.id = co.continent_id and cityEvent.cityid = c.id AND c.country_id = co.id
-# ORDER BY cnt DESC) AS a WHERE
-# (SELECT COUNT(*) FROM (SELECT con.continent_name as con, c.city_name as city, cnt
-# FROM (SELECT c.id as cityid, COUNT(*) as cnt
-# 		FROM cities as c, events AS e, venues v
-# 		WHERE e.venue_id = v.id AND v.city_id = c.id
-# 		GROUP BY c.id) AS cityEvent, continents as con, cities AS c, countries AS co
-# WHERE con.id = co.continent_id and cityEvent.cityid = c.id AND c.country_id = co.id
-# ORDER BY cnt DESC) AS b
-# WHERE b.con = a.con AND b.cnt >= a.cnt) <= 4
-# ORDER BY a.con ASC, a.cnt DESC
-
-
-# def get_last_5_city_per_continent_by_event_number():
-#
-#     """
-#     SELECT rs.*
-#     FROM (
-#             SELECT con, city, cnt, Rank() over (Partition BY con ORDER BY cnt DESC ) AS Rank
-#             FROM    (SELECT co.name as con, c.name as city, cnt
-#                     FROM (SELECT c.cityid as cityid, COUNT(*) as cnt
-#                           FROM city as c, event as e
-#                           WHERE e.cityId = c.cityId
-#                           GROUP BY c.cityid) AS cityEvent, continent as co, city as c
-#                     WHERE c.continentid = co.continentId and cityEvent.cityid = c.cityId
-#                     ORDER BY cnt)) AS rs
-#     WHERE Rank <=  5
-#     """
 
 
 def get_top_3_city_per_continent_by_artist_followers():
@@ -552,57 +296,6 @@ def get_top_3_city_per_continent_by_artist_followers():
         ORDER BY con, sum DESC"""
 
 
-#     SELECT a.con, a.city, a.s FROM (SELECT con.continent_name as con, c.city_name as city, s
-# FROM (SELECT city_ten.id as cityid, SUM(a.followers) as s
-# 		FROM events as e, artists AS a, venues AS v, artist_event AS ae, (SELECT c.id AS id, COUNT(e.id) AS cnt FROM cities AS c, venues AS v, events AS e WHERE v.id = e.venue_id AND v.city_id = c.id GROUP BY c.id HAVING cnt > 4) AS city_ten
-# 		WHERE e.venue_id = v.id AND v.city_id = city_ten.id AND e.id = ae.event_id AND ae.artist_id = a.id AND ae.is_headline = 1
-# 		GROUP BY city_ten.id) AS cityEvent, continents as con, cities AS c, countries AS co
-# WHERE con.id = co.continent_id AND cityEvent.cityid = c.id AND c.country_id = co.id
-# ORDER BY s desc) AS a WHERE
-# (SELECT COUNT(*) FROM (SELECT con.continent_name as con, c.city_name as city, s
-# FROM (SELECT city_ten.id as cityid, SUM(a.followers) as s
-# 		FROM events as e, artists AS a, venues AS v, artist_event AS ae, (SELECT c.id AS id, COUNT(e.id) AS cnt FROM cities AS c, venues AS v, events AS e WHERE v.id = e.venue_id AND v.city_id = c.id GROUP BY c.id HAVING cnt > 4 ) AS city_ten
-# 		WHERE e.venue_id = v.id AND v.city_id = city_ten.id AND e.id = ae.event_id AND ae.artist_id = a.id AND ae.is_headline = 1
-# 		GROUP BY city_ten.id) AS cityEvent, continents as con, cities AS c, countries AS co
-# WHERE con.id = co.continent_id AND cityEvent.cityid = c.id AND c.country_id = co.id
-# ORDER BY s desc) AS b
-# WHERE b.con = a.con AND b.s >= a.s) <= 3
-# ORDER BY a.con ASC, a.s DESC
-#
-# SELECT rs.*
-#     FROM (
-#         SELECT con, city, avg, Rank()
-#           over (Partition BY con
-#                 ORDER BY avg DESC ) AS Rank
-#         FROM (SELECT co.name as con, c.name as city, av as avg
-# FROM (SELECT c.cityid as cityid, AVG(a.popularity) as av
-# FROM city as c, event as e, artist as a
-# WHERE e.cityId = c.cityId AND e.artistId = a.artistId
-# GROUP BY c.cityid) AS cityEvent, continent as co, city as c
-# WHERE c.continentid = co.continentId and cityEvent.cityid = c.cityId
-# ORDER BY av DESC)
-#         ) rs WHERE Rank <= 5
-#
-#
-#
-# SELECT a.con, a.city, a.avg FROM (SELECT con.continent_name as con, c.city_name as city, av as avg
-# FROM (SELECT city_ten.id as cityid, AVG(a.popularity) as av
-# 		FROM events as e, artists AS a, venues AS v, artist_event AS ae, (SELECT c.id AS id, COUNT(e.id) AS cnt FROM cities AS c, venues AS v, events AS e WHERE v.id = e.venue_id AND v.city_id = c.id GROUP BY c.id HAVING cnt > 3) AS city_ten
-# 		WHERE e.venue_id = v.id AND v.city_id = city_ten.id AND e.id = ae.event_id AND ae.artist_id = a.id AND ae.is_headline = 1
-# 		GROUP BY city_ten.id) AS cityEvent, continents as con, cities AS c, countries AS co
-# WHERE con.id = co.continent_id AND cityEvent.cityid = c.id AND c.country_id = co.id
-# ORDER BY av DESC) AS a WHERE
-# (SELECT COUNT(*) FROM (SELECT con.continent_name as con, c.city_name as city, av as avg
-# FROM (SELECT city_ten.id as cityid, AVG(a.popularity) as av
-# 		FROM events as e, artists AS a, venues AS v, artist_event AS ae, (SELECT c.id AS id, COUNT(e.id) AS cnt FROM cities AS c, venues AS v, events AS e WHERE v.id = e.venue_id AND v.city_id = c.id GROUP BY c.id HAVING cnt > 3) AS city_ten
-# 		WHERE e.venue_id = v.id AND v.city_id = city_ten.id AND e.id = ae.event_id AND ae.artist_id = a.id AND ae.is_headline = 1
-# 		GROUP BY city_ten.id) AS cityEvent, continents as con, cities AS c, countries AS co
-# WHERE con.id = co.continent_id AND cityEvent.cityid = c.id AND c.country_id = co.id
-# ORDER BY av DESC) AS b
-# WHERE b.con = a.con AND b.avg >= a.avg) <= 5
-# ORDER BY a.con ASC, a.avg DESC
-
-
 def get_last_2_city_per_continent_by_artist_followers():
     return """
     SELECT rs.*
@@ -619,25 +312,3 @@ WHERE con.id = co.continent_id AND cityEvent.cityid = c.id AND c.country_id = co
 ORDER BY sum) AS t
         ) rs WHERE rnk <= 2
 ORDER BY con, sum DESC"""
-
-# SELECT rs.*
-#     FROM (
-#         SELECT con, city, avg, Rank()
-#           over (Partition BY con
-#                 ORDER BY avg DESC ) AS Rank
-#         FROM (SELECT co.name as con, c.name as city, av as avg
-# FROM (SELECT c.cityid as cityid, AVG(a.popularity) as av
-# FROM city as c, event as e, artist as a
-# WHERE e.cityId = c.cityId AND e.artistId = a.artistId
-# GROUP BY c.cityid) AS cityEvent, continent as co, city as c
-# WHERE c.continentid = co.continentId and cityEvent.cityid = c.cityId
-# ORDER BY av DESC)
-#         ) rs WHERE Rank <= 5
-
-# def per_main_genre_top3_artists_with_their_best_event():
-#     """
-#     SELECT
-#     FROM artists as A, artist_genre as AG, (SELECT g.id, g.genre_name, g.popularity FROM genres as g ORDER BY g.popularity DESC LIMIT 8) as MAIN_GENRE
-#     WHERE A.id = AG.artist_id AND AG.genre_id = MG.id
-#     GROUP BY MAIN_GENRE.id
-#     """
