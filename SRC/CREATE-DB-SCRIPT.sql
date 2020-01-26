@@ -98,7 +98,7 @@ CREATE UNIQUE INDEX artists_id_popularity ON artists (id, popularity);
 CREATE UNIQUE INDEX artists_id_followers ON artists (id, followers);
 CREATE UNIQUE INDEX city_country_key ON cities (id, country_id);
 CREATE UNIQUE INDEX country_continent_key ON countries (id, continent_id);
-CREATE UNIQUE INDEX players_id ON players (id);
+CREATE UNIQUE INDEX players_id_name ON players (id, player_name);
 CREATE UNIQUE INDEX genre_id_name ON genres (id, genre_name);
 CREATE UNIQUE INDEX genre_id_popularity ON genres (id, popularity);
 CREATE UNIQUE INDEX artist_to_event ON artist_event (event_id, artist_id, is_headline);
