@@ -1,4 +1,4 @@
-# concerts-trip
+# Concerts Trip
 
 This is our final project in the course "Database Systems". 
 
