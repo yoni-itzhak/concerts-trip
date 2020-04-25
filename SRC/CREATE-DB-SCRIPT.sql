@@ -24,8 +24,6 @@ CREATE TABLE artists (
   popularity INT(11) NOT NULL,
   followers BIGINT(20) NOT NULL,
   img_link TEXT,
-  img_height INT(11),
-  img_width INT(11),
   description TEXT,
   PRIMARY KEY (id)
   );
@@ -82,10 +80,10 @@ CREATE TABLE artist_genre (
   PRIMARY KEY (artist_id, genre_id)
   );
 
-ALTER TABLE cities ADD FOREIGN KEY (country_id) REFERENCES countries (id);
-ALTER TABLE countries ADD FOREIGN KEY (continent_id) REFERENCES continents (id);
 ALTER TABLE events ADD FOREIGN KEY (venue_id) REFERENCES venues (id);
 ALTER TABLE venues ADD FOREIGN KEY (city_id) REFERENCES cities (id);
+ALTER TABLE cities ADD FOREIGN KEY (country_id) REFERENCES countries (id);
+ALTER TABLE countries ADD FOREIGN KEY (continent_id) REFERENCES continents (id);
 ALTER TABLE artist_event ADD FOREIGN KEY (artist_id) REFERENCES artists (id);
 ALTER TABLE artist_event ADD FOREIGN KEY (event_id) REFERENCES events (id);
 ALTER TABLE artist_player ADD FOREIGN KEY (artist_id) REFERENCES artists (id);
@@ -100,9 +98,11 @@ CREATE UNIQUE INDEX artists_id_popularity ON artists (id, popularity);
 CREATE UNIQUE INDEX artists_id_followers ON artists (id, followers);
 CREATE UNIQUE INDEX city_country_key ON cities (id, country_id);
 CREATE UNIQUE INDEX country_continent_key ON countries (id, continent_id);
-CREATE UNIQUE INDEX players_id ON players (id);
+CREATE UNIQUE INDEX players_id_name ON players (id, player_name);
 CREATE UNIQUE INDEX genre_id_name ON genres (id, genre_name);
 CREATE UNIQUE INDEX genre_id_popularity ON genres (id, popularity);
-CREATE UNIQUE INDEX artist_to_event ON artist_event (event_id, artist_id);
+CREATE UNIQUE INDEX artist_to_event ON artist_event (event_id, artist_id, is_headline);
 CREATE UNIQUE INDEX artist_to_player ON artist_player (artist_id, player_id);
 CREATE UNIQUE INDEX artist_to_genre ON artist_genre (artist_id, genre_id);
+CREATE UNIQUE INDEX fulltext_venue_desc ON venues (description);
+CREATE UNIQUE INDEX fulltext_artist_desc ON artists (description);

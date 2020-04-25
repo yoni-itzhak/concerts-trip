@@ -6,9 +6,11 @@ def execute_query(query, *kargs):
     config = {
         'user': 'DbMysql06',
         'password': 'bowie',
-        'host': '127.0.0.1',  # mysqlsrv1.cs.tau.ac.il in production
+        # 'host': '127.0.0.1', in local
+        'host': 'mysqlsrv1.cs.tau.ac.il', # in production
         'database': 'DbMysql06',
-        'port': '3305',  # 3306 in production
+        # 'port': '3305',  in local
+        'port': '3306', # in production
         'raise_on_warnings': True
     }
 
